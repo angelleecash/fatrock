@@ -13,16 +13,11 @@ public class CubeSceneObject extends SceneObject {
 	public CubeSceneObject(SceneObject parent, Vector3d position, float size, Material material) {
 		super(parent, position);
 		this.size = size;
-		
-		translate.m03 = position.x;
-		translate.m13 = position.y;
-		translate.m23 = position.z;
-		
 		this.material = material;
 		
 		float sizeHalf = size*.5f;
 		
-		boolean useGray = true;
+		boolean useGray = false;
 		if(useGray)
 		{
 			// 0 ~ 3
@@ -84,6 +79,8 @@ public class CubeSceneObject extends SceneObject {
 		{
 			v.material = material;
 		}
+		
+		translate(position);
 	}
 	
 	

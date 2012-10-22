@@ -1,4 +1,4 @@
-package info.chenliang.fatrock;
+package info.chenliang.fatrock.trianglerenderers;
 
 import android.graphics.Bitmap;
 import android.os.Debug;
@@ -7,21 +7,23 @@ import info.chenliang.ds.Precision;
 import info.chenliang.ds.Vector2d;
 import info.chenliang.ds.Vector3d;
 import info.chenliang.ds.Vector4d;
+import info.chenliang.fatrock.PixelRenderer;
+import info.chenliang.fatrock.Texture;
+import info.chenliang.fatrock.Vertex3d;
+import info.chenliang.fatrock.ZBuffer;
 
 public class TriangleRenderer {
 	public PixelRenderer pixelRenderer;
 	public ZBuffer zBuffer;
-	private boolean projectionCorrect;
-	private Texture texture;
+	public boolean projectionCorrect;
+	public Texture texture;
 	
 	public TriangleRenderer(PixelRenderer pixelRenderer, ZBuffer zBuffer, boolean projectionCorrect, Texture texture)
 	{
 		this.pixelRenderer = pixelRenderer;
 		this.zBuffer = zBuffer;
-		//this.projectionCorrect = false;//projectionCorrect;
 		this.projectionCorrect = projectionCorrect;
 		this.texture = texture;
-		//this.projectionCorrect = false;
 	}
 	
 	public void resetZBuffer()
@@ -258,10 +260,9 @@ public class TriangleRenderer {
 					
 				}
 			}
-			
 				
 		}
-//if(true)return;
+
 		float dy32 = p3.y - p2.y;
 		if(dy32 > 0.0f)
 		{

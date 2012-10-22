@@ -6,21 +6,21 @@ import info.chenliang.ds.Precision;
 import info.chenliang.ds.Vector3d;
 
 public class Camera {
-	private Vector3d position;
-	private Vector3d lookAt;
-	private Vector3d up;
-	private float viewAngle;
-	private float nearZ, farZ;
-	private float aspectRatio;
-	private Plane3d leftPlane, rightPlane, topPlane, bottomPlane;
-	private Matrix4x4 worldToCameraTransform;
-	private Matrix4x4 cameraToProjectionTransform;
-
-	private Matrix4x4 projectionToScreenTransform;
-	private int screenWidth, screenHeight;
-	private int screenXOffset, screenYOffset;
+	public Vector3d position;
+	public Vector3d lookAt;
+	public Vector3d up;
+	public float viewAngle;
+	public float nearZ, farZ;
+	public float aspectRatio;
 	
-	private ViewFrustum viewFrustum;
+	public Matrix4x4 worldToCameraTransform;
+	public Matrix4x4 cameraToProjectionTransform;
+
+	public Matrix4x4 projectionToScreenTransform;
+	public int screenWidth, screenHeight;
+	public int screenXOffset, screenYOffset;
+	
+	public ViewFrustum viewFrustum;
 	
 	public Camera(Vector3d position, Vector3d lookAt, Vector3d up,
 			float viewAngle, float nearZ, float farZ, 

@@ -96,4 +96,14 @@ public class Matrix4x4 {
 		
 		return result;
 	}
+	
+	public void set(Matrix3x3 matrix)
+	{
+		//m00 = matrix.m00; m01 = matrix.m01; m02 = matrix.
+		m00 = matrix.m00; m01 = matrix.m01; m02 = matrix.m02; 
+		m10 = matrix.m10; m11 = matrix.m11; m12 = matrix.m12; 
+		m20 = matrix.m20; m21 = matrix.m21; m22 = matrix.m22; 
+			
+				
+	}
 }
