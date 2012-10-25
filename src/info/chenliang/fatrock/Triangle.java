@@ -9,6 +9,7 @@ public class Triangle {
 	public Mesh mesh;
 	public Vector3d normal;
 	public Vector2d texturePosition1, texturePosition2, texturePosition3;
+	public boolean culled;
 	
 	public Triangle(Mesh mesh, int v1, int v2, int v3, Vector2d texturePosition1, Vector2d texturePosition2, Vector2d texturePosition3) {
 		super();

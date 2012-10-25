@@ -8,10 +8,7 @@ public class Matrix4x4 {
 	
 	public Matrix4x4()
 	{
-		set(1, 0, 0, 0, 
-			0, 1, 0, 0, 
-			0, 0, 1, 0, 
-			0, 0, 0, 1);
+		makeIdentity();
 	}
 	
 	public void set(float m00, float m01, float m02, float m03,
@@ -102,8 +99,14 @@ public class Matrix4x4 {
 		//m00 = matrix.m00; m01 = matrix.m01; m02 = matrix.
 		m00 = matrix.m00; m01 = matrix.m01; m02 = matrix.m02; 
 		m10 = matrix.m10; m11 = matrix.m11; m12 = matrix.m12; 
-		m20 = matrix.m20; m21 = matrix.m21; m22 = matrix.m22; 
-			
-				
+		m20 = matrix.m20; m21 = matrix.m21; m22 = matrix.m22; 				
+	}
+	
+	public void makeIdentity()
+	{
+		set(1, 0, 0, 0, 
+			0, 1, 0, 0, 
+			0, 0, 1, 0, 
+			0, 0, 0, 1);		
 	}
 }

@@ -5,7 +5,7 @@ import android.util.SparseArray;
 public class DynamicZBuffer extends ZBuffer {
 	private SparseArray<Float> zBuffer;
 	
-	public DynamicZBuffer(int width, int height, ZBufferComparer  zBufferComparer)
+	public DynamicZBuffer(int width, int height, ZBufferComparer zBufferComparer)
 	{
 		super(width, height, zBufferComparer);
 		zBuffer = new SparseArray<Float>();
@@ -16,7 +16,7 @@ public class DynamicZBuffer extends ZBuffer {
 		Float f = zBuffer.get(x << 16 | y);
 		if(f == null)
 		{
-			f = Float.MAX_VALUE;
+			f = zBufferComparer.getDefaultZ();
 		}
 		return f;
 	}
@@ -27,7 +27,7 @@ public class DynamicZBuffer extends ZBuffer {
 	}
 
 	@Override
-	public void reset(float z) {
+	public void reset() {
 		zBuffer.clear();
 	}
 

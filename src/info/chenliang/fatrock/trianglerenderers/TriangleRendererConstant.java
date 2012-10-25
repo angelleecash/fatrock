@@ -1,8 +1,6 @@
 package info.chenliang.fatrock.trianglerenderers;
 
 import info.chenliang.ds.Precision;
-import info.chenliang.ds.Vector2d;
-import info.chenliang.ds.Vector3d;
 import info.chenliang.ds.Vector4d;
 import info.chenliang.fatrock.PixelRenderer;
 import info.chenliang.fatrock.Vertex3d;
@@ -10,10 +8,12 @@ import info.chenliang.fatrock.ZBuffer;
 
 public class TriangleRendererConstant extends TriangleRenderer 
 {
+	public int constantColor;
 	
-	public TriangleRendererConstant(PixelRenderer pixelRenderer, ZBuffer zBuffer, boolean projectionCorrect)
+	public TriangleRendererConstant(PixelRenderer pixelRenderer, ZBuffer zBuffer, boolean projectionCorrect, int constantColor)
 	{
 		super(pixelRenderer, zBuffer, projectionCorrect, null);
+		this.constantColor = constantColor;
 	}
 	
 	
@@ -65,10 +65,6 @@ public class TriangleRendererConstant extends TriangleRenderer
 			return;
 		}
 		
-		Vector3d color1 = v1.transformedColor;
-		Vector3d color2 = v2.transformedColor;
-		Vector3d color3 = v3.transformedColor;
-		
 		boolean right = cross > 0;		
 		
 		float dxLeft = 0.0f, dxRight = 0.0f, dzLeft=0.0f, dzRight=0.0f;
@@ -76,8 +72,6 @@ public class TriangleRendererConstant extends TriangleRenderer
 		float dz21 = p2.w - p1.w;
 		float _dz31 = 1/p3.w - 1/p1.w;
 		
-		Vector3d _colorStepLeft = new Vector3d(0, 0, 0);
-		Vector3d _colorStepRight = new Vector3d(0, 0, 0);
 		if(dy21 > 0.0f)
 		{
 			int startY = (int)Math.ceil(p1.y);
@@ -102,18 +96,6 @@ public class TriangleRendererConstant extends TriangleRenderer
 					dzLeft = right ? dz31/dy31 : dz21/dy21;
 					dzRight = right ? dz21/dy21 : dz31/dy31;
 				}
-				
-				Vector3d colorStepLeft = right?color3.minus(color1):color2.minus(color1);
-				Vector3d colorStepRight = right?color2.minus(color1):color3.minus(color1);
-				
-				Vector3d colorLeft = new Vector3d(color1);
-				Vector3d colorRight = new Vector3d(color1);
-				
-				colorStepLeft.scale(right?1/dy31:1/dy21);
-				colorStepRight.scale(right?1/dy21:1/dy31);
-				
-				_colorStepLeft.copy(colorStepLeft);
-				_colorStepRight.copy(colorStepRight);
 
 				float zLeft = projectionCorrect ? 1/p1.w : p1.w + dzLeft*subPixelY;
 				float zRight = projectionCorrect ? 1/p1.w : p1.w + dzRight*subPixelY;
@@ -133,21 +115,17 @@ public class TriangleRendererConstant extends TriangleRenderer
 						float z = zLeft;
 						float subPixelX = startX - xLeft;
 						z += subPixelX*dz;
-						Vector3d _color = new Vector3d(colorLeft); 
-						Vector3d _colorStep = colorRight.minus(colorLeft);
-						_colorStep.scale(1.0f/xSpan);
+						
 						for(int x=startX; x <= endX; x++)
 						{
 							float _z = zBuffer.getZ(x, y);
 							if(zBuffer.zBufferComparer.compare(_z, z))						
 							{
-								pixelRenderer.setPixel(x, y, _color.asColor());
-								//pixelRenderer.setPixel(x, y, right?0xffff0000:0xff00ff00);
+								pixelRenderer.setPixel(x, y, constantColor);
 								zBuffer.setZ(x, y, z);					
 							}
 							
 							z += dz;
-							_color = _color.add(_colorStep);
 						}
 					}
 					
@@ -156,10 +134,6 @@ public class TriangleRendererConstant extends TriangleRenderer
 					
 					zLeft += dzLeft;
 					zRight += dzRight;
-					
-					colorLeft = colorLeft.add(colorStepLeft);
-					colorRight = colorRight.add(colorStepRight);
-					
 				}
 			}
 				
@@ -214,15 +188,6 @@ public class TriangleRendererConstant extends TriangleRenderer
 					dzRight = right ? dz32/dy32 : dz31/dy31;	
 				}
 				
-				Vector3d colorLeft = right ? color1.add(_colorStepLeft.scale2(dy21)) : new Vector3d(color2);
-				Vector3d colorRight = right? new Vector3d(color2) : color1.add(_colorStepRight.scale2(dy21));
-				
-				Vector3d colorStepLeft = right?color3.minus(color1):color3.minus(color2);
-				Vector3d colorStepRight = right?color3.minus(color2):color3.minus(color1);
-
-				colorStepLeft.scale(right?1/dy31:1/dy32);
-				colorStepRight.scale(right?1/dy32:1/dy31);
-				
 				zLeft += subPixelY*dzLeft;
 				zRight += subPixelY*dzRight;
 				
@@ -239,23 +204,16 @@ public class TriangleRendererConstant extends TriangleRenderer
 						float subPixelX = startX - xLeft;
 						z += subPixelX*dz;
 						
-						Vector3d _color = new Vector3d(colorLeft);
-						Vector3d _colorStep = colorRight.minus(colorLeft);
-						_colorStep.scale(1.0f/xSpan);
-						
 						for(int x=startX; x <= endX; x++)
 						{
 							float _z = zBuffer.getZ(x, y);
 							if(zBuffer.zBufferComparer.compare(_z, z))
 							{
-								pixelRenderer.setPixel(x, y, _color.asColor());
-								//pixelRenderer.setPixel(x, y, right?0xffff0000:0xff00ff00);
+								pixelRenderer.setPixel(x, y, constantColor);
 								zBuffer.setZ(x, y, z);
 							}
 							
 							z += dz;
-							_color = _color.add(_colorStep);
-							
 						}
 					}
 					
@@ -264,21 +222,17 @@ public class TriangleRendererConstant extends TriangleRenderer
 					
 					zLeft += dzLeft;
 					zRight += dzRight;
-					
-					colorLeft = colorLeft.add(colorStepLeft);
-					colorRight = colorRight.add(colorStepRight);
-					
 				}	
 			}
 		}
 		
-//		p1.z = p1.w;
-//		p2.z = p2.w;
-//		p3.z = p3.w;
-//		
-//		drawLine3d(p1.degenerate(), p3.degenerate(),0xff000000);
-//		drawLine3d(p1.degenerate(), p2.degenerate(), 0xff000000);
-//		drawLine3d(p2.degenerate(), p3.degenerate(), 0xff000000);
+		p1.z = p1.w;
+		p2.z = p2.w;
+		p3.z = p3.w;
+		
+		drawLine3d(p1.degenerate(), p3.degenerate(),0xffffffff);
+		drawLine3d(p1.degenerate(), p2.degenerate(), 0xffffffff);
+		drawLine3d(p2.degenerate(), p3.degenerate(), 0xffffffff);
 		
 	}
 }

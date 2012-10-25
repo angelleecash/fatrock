@@ -14,5 +14,5 @@ public abstract class ZBuffer {
 	
 	public abstract float getZ(int x, int y);
 	public abstract void setZ(int x, int y, float z);
-	public abstract void reset(float z);
+	public abstract void reset();
 }

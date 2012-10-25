@@ -22,6 +22,8 @@ public class Camera {
 	
 	public ViewFrustum viewFrustum;
 	
+	public ProjectionType projectionType;
+	
 	public Camera(Vector3d position, Vector3d lookAt, Vector3d up,
 			float viewAngle, float nearZ, float farZ, 
 			int screenWidth, int screenHeight, int screenXOffset, int screenYOffset) {
@@ -37,18 +39,23 @@ public class Camera {
 		this.screenXOffset = screenXOffset;
 		this.screenYOffset = screenYOffset;
 		this.aspectRatio = (float)(screenWidth*1.0/screenHeight);
+		this.projectionType = ProjectionType.ORTHOGONALITY;
+		
 		
 		worldToCameraTransform = new Matrix4x4();
 		cameraToProjectionTransform = new Matrix4x4();
 		projectionToScreenTransform = new Matrix4x4();
-		viewFrustum = new ViewFrustum();
-		
 		
 		updateWorldToCameraTransform();
 		updateCameraToProjectionTransform();
-		updateProjectionToScreenTransform();
 		
-		viewFrustum.update(cameraToProjectionTransform.multiply(worldToCameraTransform));
+		if(projectionType == ProjectionType.PERSPECTIVE)
+		{
+			updateProjectionToScreenTransform();
+			
+			viewFrustum = new ViewFrustum();		
+			viewFrustum.update(cameraToProjectionTransform.multiply(worldToCameraTransform));			
+		}
 	}
 	
 	public void setScreenOffsets(int screenXOffset, int screenYOffset)
@@ -60,16 +67,28 @@ public class Camera {
 	
 	private void updateProjectionToScreenTransform()
 	{
-		//x' = screenWidth/2 * x + screenWidth/2 + screenXOffset;
-		//y' = -screenHeight/2 * y + screenHeight/2 + screenYOffset;
-		
 		float screenWidthHalf = screenWidth*1.0f/2;
 		float screenHeightHalf = screenHeight*1.0f/2;
 		
-		projectionToScreenTransform.set(screenWidthHalf, 0, 0, screenWidthHalf + screenXOffset, 
-										0, -screenHeightHalf, 0, screenHeightHalf + screenYOffset, 
-										0, 0, 1, 0, 
-										0, 0, 0, 1);
+		if(projectionType == ProjectionType.PERSPECTIVE)
+		{
+			//x' = screenWidth/2 * x + screenWidth/2 + screenXOffset;
+			//y' = -screenHeight/2 * y + screenHeight/2 + screenYOffset;
+			
+			projectionToScreenTransform.set(screenWidthHalf, 0, 0, screenWidthHalf + screenXOffset, 
+											0, -screenHeightHalf, 0, screenHeightHalf + screenYOffset, 
+											0, 0, 1, 0, 
+											0, 0, 0, 1);			
+		}
+		else if(projectionType == ProjectionType.ORTHOGONALITY)
+		{
+			//x' = x + screenWidth/2 + screenXOffset 
+			//y' = -y + screenHeight/2 + screenYOffset;
+			projectionToScreenTransform.set(1, 0, 0, screenWidthHalf + screenXOffset, 
+											0, -1, 0, screenHeightHalf + screenYOffset, 
+											0, 0, 1, 0, 
+											0, 0, 0, 1);
+		}
 	}
 	
 	private void updateWorldToCameraTransform()
@@ -100,37 +119,45 @@ public class Camera {
 	
 	private void updateCameraToProjectionTransform()
 	{
-		float viewAngleInRadian = (float)(Math.toRadians(viewAngle/2));
-		Assert.judge(!Precision.getInstance().equals(viewAngleInRadian, 0.0f), "View angle should be greater than zero!");
 		
-		float d = (float)(1 / Math.tan(viewAngleInRadian));
-		
-		Assert.judge(!Precision.getInstance().equals(nearZ, farZ), "near and far z should not be the same!");
-		
-		/*
-		 * We need to set A && B so that for bigger z, the projected z is also bigger
-		 * So we can employ different fules
-		 * 1 f(far) = 1 & f(near) = -1   A =  (f + n) / (f - n)    B = - 2 * f * n / (f - n)
-		 * 2 f(far) = 1 & f(near) = 0    A =  f / (f - n)			B = - f * n / (f - n)
-		 * f(far) = -1 & f(near) = 1	  A = (- f - n) / (f - n)   B = (2 * n * f) / (f - n)
-		 */
-		
-		//| d/AR  0 0 0|
-		//| 0     d 0 0|
-		//| 0     0 A B|
-		//| 0     0 1 0|
-		
-		/*
-		float A = (farZ + nearZ) / (farZ - nearZ);
-		float B = -2 * farZ * nearZ / (farZ - nearZ);
-		*/
-		
-		float A = farZ / (farZ - nearZ);
-		float B = - farZ * nearZ / (farZ - nearZ);
-		cameraToProjectionTransform.set(d/aspectRatio, 0, 0, 0,
-										0, d, 0, 0, 
-										0, 0, A, B, 
-										0, 0, 1, 0);
+		if(projectionType == ProjectionType.PERSPECTIVE)
+		{
+			float viewAngleInRadian = (float)(Math.toRadians(viewAngle/2));
+			Assert.judge(!Precision.getInstance().equals(viewAngleInRadian, 0.0f), "View angle should be greater than zero!");
+			
+			float d = (float)(1 / Math.tan(viewAngleInRadian));
+			
+			Assert.judge(!Precision.getInstance().equals(nearZ, farZ), "near and far z should not be the same!");
+			
+			/*
+			 * We need to set A && B so that for bigger z, the projected z is also bigger
+			 * So we can employ different fules
+			 * 1 f(far) = 1 & f(near) = -1   A =  (f + n) / (f - n)    B = - 2 * f * n / (f - n)
+			 * 2 f(far) = 1 & f(near) = 0    A =  f / (f - n)			B = - f * n / (f - n)
+			 * f(far) = -1 & f(near) = 1	  A = (- f - n) / (f - n)   B = (2 * n * f) / (f - n)
+			 */
+			
+			//| d/AR  0 0 0|
+			//| 0     d 0 0|
+			//| 0     0 A B|
+			//| 0     0 1 0|
+			
+			/*
+			float A = (farZ + nearZ) / (farZ - nearZ);
+			float B = -2 * farZ * nearZ / (farZ - nearZ);
+			*/
+			
+			float A = farZ / (farZ - nearZ);
+			float B = - farZ * nearZ / (farZ - nearZ);
+			cameraToProjectionTransform.set(d/aspectRatio, 0, 0, 0,
+											0, d, 0, 0, 
+											0, 0, A, B, 
+											0, 0, 1, 0);			
+		}
+		else if(projectionType == ProjectionType.ORTHOGONALITY)
+		{
+			cameraToProjectionTransform.makeIdentity();
+		}
 	}
 	
 	public void setWorldToCameraTransform(Matrix4x4 worldToCameraTransform) {

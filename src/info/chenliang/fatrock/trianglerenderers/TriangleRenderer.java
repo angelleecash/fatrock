@@ -28,15 +28,7 @@ public class TriangleRenderer {
 	
 	public void resetZBuffer()
 	{
-		if(projectionCorrect)
-		{
-			zBuffer.reset(Float.MIN_VALUE);
-		}
-		else
-		{
-			zBuffer.reset(Float.MAX_VALUE);	
-		}
-		
+		zBuffer.reset();
 	}
 	
 	private Vector3d getRandomColor()
@@ -457,7 +449,7 @@ public class TriangleRenderer {
 			//float subPixelX = x - xStart;
 			//z += subPixelX*;
 			float _z = zBuffer.getZ(x, y);
-			if(zBuffer.zBufferComparer.compare(_z, z))
+			if(true||zBuffer.zBufferComparer.compare(_z, z))
 			{
 				pixelRenderer.setPixel(x, y, color);
 				zBuffer.setZ(x, y, z);

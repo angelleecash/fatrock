@@ -13,12 +13,21 @@ public class FixedSizeZBuffer extends ZBuffer {
 	
 	@Override
 	public float getZ(int x, int y) {
-		return zBuffer[y*width + x];
+		int index = y*width + x;
+		if(index >= 0 && index < zBuffer.length)
+		{
+			return zBuffer[index];	
+		}
+		else
+		{
+			return zBufferComparer.getDefaultZ();
+		}
+		
 	}
 
 	@Override
-	public void reset(float z) {
-		Arrays.fill(zBuffer, z);
+	public void reset() {
+		Arrays.fill(zBuffer, zBufferComparer.getDefaultZ());
 	}
 
 	@Override

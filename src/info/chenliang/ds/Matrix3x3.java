@@ -45,7 +45,11 @@ public class Matrix3x3 {
 		Vector3d yAxis = new Vector3d(0, 1, 0).scaleAlong(n, k);
 		Vector3d zAxis = new Vector3d(0, 0, 1).scaleAlong(n, k);
 		
-		return new Matrix3x3(xAxis, yAxis, zAxis);
+		Matrix3x3 m = new Matrix3x3();
+		m.set(xAxis.x, yAxis.x, zAxis.x,
+			  xAxis.y, yAxis.y, zAxis.y,
+			  xAxis.z, yAxis.z, zAxis.z);
+		return m;
 	}
 	
 	public void set(float m00, float m01, float m02,
